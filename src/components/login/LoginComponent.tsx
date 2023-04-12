@@ -83,10 +83,10 @@ const LoginComponent: React.FC = () => {
           Logar
         </button>
         <button className=" rounded-xl bg-orange-700 p-4 text-white">
-          Entrar com conta Google
+          Entrar com Google
         </button>
         <button className=" rounded-xl bg-blue-700 p-4 text-white">
-          Entrar com conta Facebook
+          Entrar com Facebook
         </button>
         <button
           className="my-8 rounded-xl bg-black p-4 text-white hover:bg-gray-900"
