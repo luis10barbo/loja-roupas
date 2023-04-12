@@ -1,3 +1,4 @@
+import { signIn } from "next-auth/react";
 import { useContext, useState } from "react";
 import { LoginPageContext } from "~/context/loginPage/LoginPageContext";
 import {
@@ -11,6 +12,7 @@ import {
   emailValidation,
   passwordValidation,
 } from "~/utils/typeValidation/stringValidation";
+import ErrorComponent from "./ErrorComponent";
 
 const RegisterComponent: React.FC = () => {
   const { setMethod } = useContext(LoginPageContext);
@@ -39,6 +41,7 @@ const RegisterComponent: React.FC = () => {
       const newSet = removeEnumFromSet(oldSet, EmailValidationError);
       return addToSet(newSet, result);
     });
+    return result;
   }
 
   function validatePassword() {
@@ -48,56 +51,24 @@ const RegisterComponent: React.FC = () => {
       let newSet = removeEnumFromSet(oldSet, PasswordValidationError);
       return addToSet(newSet, result);
     });
+    return result;
   }
 
-  const canLogin =
-    registerErrors.has("PasswordInvalid") ||
-    registerErrors.has("EmailInvalid") ||
-    !password ||
-    !email;
+  function tryRegister() {
+    const emailValidationResult = validateEmail();
+    const passwordValidationResult = validatePassword();
+
+    if (emailValidationResult.length > 0 || passwordValidationResult.length > 0)
+      return;
+
+    signIn("email");
+  }
 
   return (
     <>
       Registrar:
-      {/* <button
-        className="absolute left-0 top-0 m-8 rounded-xl p-4 duration-75 hover:bg-black hover:text-white"
-        onClick={() => {
-          setMethod("nomethod");
-        }}
-      >
-        ◂ Voltar
-      </button> */}
       <div className="z-20 flex h-full w-full  max-w-screen-md flex-col justify-center gap-4">
-        {registerErrors.size > 0 && (
-          <div className="errors mb-4 text-center text-red-500">
-            <p>ERROS:</p>
-            {registerErrors.has("NoCharsBeforeDomain") && (
-              <p>
-                O email precisa ter caracteres antes do dominio, Ex: a@gmail.com
-              </p>
-            )}
-            {registerErrors.has("NoDomain") && (
-              <p>
-                *O email precisa ter um dominio, Ex: @gmail.com, @hotmail.com
-              </p>
-            )}
-            {registerErrors.has("InvalidCharsBeforeDomain") && (
-              <p>*Caracteres invalidos antes do domínio.</p>
-            )}
-            {registerErrors.has("PasswordInvalidChars") && (
-              <p>
-                *A senha fornecida tem caractéres inválidos, somente use (a-z,
-                A-Z, 0-9, !@#$%^&*)
-              </p>
-            )}
-            {registerErrors.has("PasswordLowCharNumber") && (
-              <p>*A senha fornecida tem menos que 8 caracteres</p>
-            )}
-            {registerErrors.has("PasswordsNotMatch") && (
-              <p>*As senhas não correspondem</p>
-            )}
-          </div>
-        )}
+        {registerErrors.size > 0 && <ErrorComponent errors={registerErrors} />}
         <input
           type="email"
           className={`w-full rounded-xl border p-3 outline-none ${
@@ -131,10 +102,10 @@ const RegisterComponent: React.FC = () => {
           onBlur={() => validatePassword()}
         />
         <button
-          className={`mt-8 rounded-xl bg-purple-700 p-4 text-white ${
-            canLogin ? "opacity-50" : ""
-          }`}
-          disabled={canLogin}
+          className={`mt-8 rounded-xl bg-purple-700 p-4 text-white`}
+          onClick={() => {
+            tryRegister();
+          }}
         >
           Criar conta
         </button>

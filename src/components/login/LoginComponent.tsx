@@ -8,6 +8,7 @@ import {
   passwordValidation,
 } from "~/utils/typeValidation/stringValidation";
 import ErrorComponent from "./ErrorComponent";
+import { signIn } from "next-auth/react";
 
 const LoginComponent: React.FC = () => {
   const { setMethod } = useContext(LoginPageContext);
@@ -25,6 +26,7 @@ const LoginComponent: React.FC = () => {
       const newSet = removeEnumFromSet(oldSet, EmailValidationError);
       return addToSet(newSet, result);
     });
+    return result;
   }
 
   function validatePassword() {
@@ -34,19 +36,24 @@ const LoginComponent: React.FC = () => {
       const newSet = removeEnumFromSet(oldSet, PasswordValidationError);
       return addToSet(newSet, result);
     });
+    return result;
   }
 
-  const canLogin =
-    loginErrors.has("PasswordInvalid") ||
-    loginErrors.has("EmailInvalid") ||
-    !password ||
-    !email;
+  function trySignIn() {
+    const emailValidationResult = validateEmail();
+    const passwordValidationResult = validatePassword();
+
+    if (emailValidationResult.length > 0 || passwordValidationResult.length > 0)
+      return;
+
+    signIn("email");
+  }
 
   return (
     <>
       Entrar
       <div className="z-20 flex h-full  w-full max-w-screen-md flex-col justify-center gap-4">
-        <ErrorComponent loginErrors={loginErrors} />
+        <ErrorComponent errors={loginErrors} />
         <input
           type="email"
           className={`w-full rounded-xl border p-3 outline-none duration-75 ${
@@ -75,17 +82,17 @@ const LoginComponent: React.FC = () => {
         />
 
         <button
-          className={`mt-8 rounded-xl bg-purple-700 p-4 text-white ${
-            canLogin ? "opacity-50" : ""
-          }`}
-          disabled={canLogin}
+          className={`mt-8 rounded-xl bg-purple-700 p-4 text-white hover:bg-purple-600 `}
+          onClick={() => {
+            trySignIn();
+          }}
         >
           Logar
         </button>
-        <button className=" rounded-xl bg-orange-700 p-4 text-white">
+        <button className=" rounded-xl bg-orange-700 p-4 text-white hover:bg-orange-600">
           Entrar com Google
         </button>
-        <button className=" rounded-xl bg-blue-700 p-4 text-white">
+        <button className=" rounded-xl bg-blue-700 p-4 text-white hover:bg-blue-600">
           Entrar com Facebook
         </button>
         <button
