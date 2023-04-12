@@ -4,19 +4,19 @@ import {
 } from "~/utils/typeValidation/stringValidation";
 
 const ErrorComponent: React.FC<{
-  loginErrors: Set<EmailValidationError | PasswordValidationError>;
-}> = ({ loginErrors }) => {
-  if (loginErrors.size < 1) return <></>;
+  errors: Set<EmailValidationError | PasswordValidationError>;
+}> = ({ errors }) => {
+  if (errors.size < 1) return <></>;
   return (
     <div className="errors mb-4 text-center text-red-500">
-      <p>ERROS:</p>
-      {loginErrors.has("NoCharsBeforeDomain") && (
+      <p>ERRO:</p>
+      {errors.has("NoCharsBeforeDomain") && (
         <p>
           O email precisa ter caracteres antes do dominio, Ex:{" "}
           <span className="font-semibold">caracteresaqui</span>@gmail.com
         </p>
       )}
-      {loginErrors.has("NoDomain") && (
+      {errors.has("NoDomain") && (
         <p>
           *O email precisa ter um dominio, Ex:{" "}
           <span className="font-semibold">@gmail.com</span>,{" "}
@@ -24,22 +24,20 @@ const ErrorComponent: React.FC<{
           <span className="font-semibold">@outlook.com</span>{" "}
         </p>
       )}
-      {loginErrors.has("EmailEmpty") && <p>*Você precisa digitar um Email</p>}
-      {loginErrors.has("InvalidCharsBeforeDomain") && (
+      {errors.has("EmailEmpty") && <p>*Você precisa digitar um Email</p>}
+      {errors.has("InvalidCharsBeforeDomain") && (
         <p>*Caracteres inválidos antes do domínio.</p>
       )}
-      {loginErrors.has("PasswordInvalidChars") && (
+      {errors.has("PasswordInvalidChars") && (
         <p>
           *A senha fornecida tem caracteres invalidos, somente use (a-z, A-Z,
           0-9, !@#$%^&*)
         </p>
       )}
-      {loginErrors.has("PasswordLowCharNumber") && (
+      {errors.has("PasswordLowCharNumber") && (
         <p>*A senha fornecida tem menos que 8 caracteres</p>
       )}
-      {loginErrors.has("PasswordEmpty") && (
-        <p>*Você precisa digitar uma Senha</p>
-      )}
+      {errors.has("PasswordEmpty") && <p>*Você precisa digitar uma Senha</p>}
     </div>
   );
 };
