@@ -18,7 +18,7 @@ export function removeEnumFromSet<T, E extends object>(
   enumObject: E
 ) {
   const newSet = new Set(set);
-  Object.values(enumObject).map((value) => {
+  Object.values(enumObject).map((value: E[keyof E]) => {
     newSet.delete(value);
   });
   return newSet;
