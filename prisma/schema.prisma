@@ -48,13 +48,15 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
+    id             String           @id @default(cuid())
+    name           String?
+    email          String?          @unique
+    emailVerified  DateTime?
+    image          String?
+    accounts       Account[]
+    sessions       Session[]
+    ProductComment ProductComment[]
+    Person         Person?
 }
 
 model VerificationToken {
@@ -63,4 +65,123 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+// PRODUCT 
+
+model Product {
+    productId          Int    @id @unique @default(autoincrement())
+    productName        String
+    productDescription String
+    productPrice       Float
+    productCount       Int
+
+    saleId      Int
+    productSale ProductSale?
+
+    productSizes  ProductSize[]
+    productImages ProductImage[]
+
+    inWishlists Wishlist[]
+}
+
+model ProductSize {
+    sizeId   String @id
+    sizeName String
+
+    Product   Product? @relation(fields: [productId], references: [productId])
+    productId Int?
+}
+
+model ProductSale {
+    saleId     Int      @id @default(autoincrement())
+    salePrice  String
+    expireDate DateTime
+
+    productId Int     @unique
+    Product   Product @relation(fields: [productId], references: [productId])
+}
+
+model ProductImage {
+    productImageId   Int    @id @default(autoincrement())
+    productImagePath String
+
+    productId Int
+    Product   Product @relation(fields: [productId], references: [productId])
+}
+
+model ProductComment {
+    productCommentId      Int       @id @default(autoincrement())
+    productCommentContent String
+    dateCreated           DateTime  @default(now())
+    dateModified          DateTime?
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    repliesTo ProductComment   @relation("reply", fields: [productCommentId], references: [productCommentId])
+    repliedBy ProductComment[] @relation("reply")
+}
+
+// ORDER
+
+model Order {
+    orderId Int @id @default(autoincrement())
+
+    orderProducts OrderProduct[]
+
+    addressId   Int
+    deliveredTo Address @relation(fields: [addressId], references: [addressId])
+}
+
+model OrderProduct {
+    orderProductId Int @id @default(autoincrement())
+
+    orderId Int?
+    order   Order? @relation(fields: [orderId], references: [orderId])
+
+    buycartId String?
+    Buycart   Buycart? @relation(fields: [buycartId], references: [buycartId])
+}
+
+// PERSON
+model Person {
+    personId      String @id @default(cuid())
+    personCpf     Int
+    personName    String
+    personSurname String
+
+    userId    String    @unique
+    user      User      @relation(fields: [userId], references: [id])
+    Addresses Address[]
+}
+
+// ADDRESS
+model Address {
+    addressId    Int    @id @default(autoincrement())
+    addressZip   Int
+    addressState String
+    addressCity  String
+    addressLine1 String
+    addressLine2 String
+
+    addressTimesUsed Int @default(dbgenerated("0"))
+
+    personId String
+    person   Person @relation(fields: [personId], references: [personId])
+
+    orders Order[]
+}
+
+// USER OWNED
+model Wishlist {
+    wishlistId String @id @default(cuid())
+
+    products Product[]
+}
+
+model Buycart {
+    buycartId String @id @default(cuid())
+
+    orderProducts OrderProduct[]
 }
